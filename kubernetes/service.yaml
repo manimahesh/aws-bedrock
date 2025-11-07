@@ -1,0 +1,17 @@
+# kubernetes/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: travel-agent-service
+  labels:
+    app: travel-agent
+spec:
+  # Use LoadBalancer type to expose the service externally via an AWS Load Balancer
+  type: LoadBalancer
+  selector:
+    app: travel-agent # Selects the Pods with this label (i.e., your Deployment)
+  ports:
+    # Port 80 on the Load Balancer will forward traffic to port 3000 on the Pods
+    - protocol: TCP
+      port: 80 # The port the load balancer listens on (standard HTTP)
+      targetPort: 3000 # The containerPort defined in your Deployment

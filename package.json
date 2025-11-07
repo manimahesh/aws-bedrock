@@ -1,0 +1,15 @@
+{
+  "name": "ai-travel-agent",
+  "version": "1.0.0",
+  "description": "AI Agent for generating travel itineraries using Bedrock/OpenAI",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "dotenv": "^16.3.1",
+    "@aws-sdk/client-bedrock-runtime": "3.x",  
+    "@aws-sdk/credential-providers": "3.x"  
+  }
+}

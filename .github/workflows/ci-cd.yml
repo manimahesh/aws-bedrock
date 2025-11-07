@@ -1,0 +1,76 @@
+# .github/workflows/deploy.yml
+name: AWS Bedrock CI/CD to AWS ECR and EKS
+
+on:
+  push:
+    branches:
+      - main # Trigger on push to the main branch
+  workflow_dispatch:
+
+env:
+  # AWS and ECR settings - **UPDATE THESE VALUES**
+  AWS_REGION: us-west-2
+  ECR_REPOSITORY: ai-travel-agent-repo
+  ECR_REGISTRY: images
+  EKS_CLUSTER_NAME: mmani-ai-cluster
+  IMAGE_TAG: ${{ github.sha }} # Use the commit SHA as the image tag
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # Required for OIDC/IRSA authentication
+
+    steps:
+    - name: ⬇️ Checkout code
+      uses: actions/checkout@v4
+
+    - name: ⚙️ Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_IAM_ROLE_ARN }}
+        #aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        #aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: 🐳 Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+
+    - name: 🔨 Build, Tag, and Push Docker image to ECR
+      id: build-image
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+      run: |
+        # Build the Docker image
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        # Push the Docker image to ECR
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        # Output the full image URI for the deployment step
+        echo "image_uri=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+    - name: 🌐 Update Kubeconfig for EKS
+      # This step authenticates kubectl with your EKS cluster
+      run: |
+        aws eks update-kubeconfig --name ${{ env.EKS_CLUSTER_NAME }} --region ${{ env.AWS_REGION }}
+
+    - name: 🚀 Deploy to EKS
+      run: |
+        IMAGE_URI=${{ steps.build-image.outputs.image_uri }}
+        
+        # 1. Substitute the new image tag in the Kubernetes deployment file
+        # This replaces the <ECR_IMAGE_PLACEHOLDER> in kubernetes/deployment.yaml
+        sed -i "s|<ECR_IMAGE_PLACEHOLDER>|$IMAGE_URI|g" kubernetes/deployment.yaml
+        
+        # 2. Apply the Secrets (only creates it if it doesn't exist)
+        # echo "Applying Kubernetes Secrets..."
+        # kubectl apply -f kubernetes/secrets.yaml
+        
+        # 2. Apply the Service manifest (only creates it if it doesn't exist)
+        echo "Applying Kubernetes Service..."
+        kubectl apply -f kubernetes/service.yaml
+        
+        # 3. Apply the updated Deployment manifest (triggers a rolling update)
+        echo "Applying Kubernetes Deployment with image: $IMAGE_URI"
+        kubectl apply -f kubernetes/deployment.yaml
