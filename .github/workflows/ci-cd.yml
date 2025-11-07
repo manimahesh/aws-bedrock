@@ -10,9 +10,9 @@ on:
 env:
   # AWS and ECR settings - **UPDATE THESE VALUES**
   AWS_REGION: us-west-2
-  ECR_REPOSITORY: ai-travel-agent-repo
+  ECR_REPOSITORY: bedrock-travel-agent-repo
   ECR_REGISTRY: images
-  EKS_CLUSTER_NAME: mmani-ai-cluster
+  EKS_CLUSTER_NAME: mmani-bedrock-cluster
   IMAGE_TAG: ${{ github.sha }} # Use the commit SHA as the image tag
 
 jobs:
