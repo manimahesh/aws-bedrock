@@ -60,10 +60,6 @@ jobs:
         # This replaces the <ECR_IMAGE_PLACEHOLDER> in kubernetes/deployment.yaml
         sed -i "s|<ECR_IMAGE_PLACEHOLDER>|$IMAGE_URI|g" kubernetes/deployment.yaml
         
-        # 2. Apply the Secrets (only creates it if it doesn't exist)
-        # echo "Applying Kubernetes Secrets..."
-        # kubectl apply -f kubernetes/secrets.yaml
-        
         # 2. Apply the Service manifest (only creates it if it doesn't exist)
         echo "Applying Kubernetes Service..."
         kubectl apply -f kubernetes/service.yaml
