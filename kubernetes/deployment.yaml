@@ -18,7 +18,7 @@ spec:
       serviceAccountName: travel-agent-sa
       containers:
       - name: travel-agent-container
-        image: 623386377217.dkr.ecr.us-west-2.amazonaws.com/ai-travel-agent-repo:e4e127eb36e2e5d9d88759772385a9fe0ceb28e3 
+        image: <ECR_IMAGE_PLACEHOLDER> 
         imagePullPolicy: Always
         ports:
         - containerPort: 3000 # Matches the port exposed by your Express app (server.js)

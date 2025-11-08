@@ -59,11 +59,15 @@ jobs:
         # 1. Substitute the new image tag in the Kubernetes deployment file
         # This replaces the <ECR_IMAGE_PLACEHOLDER> in kubernetes/deployment.yaml
         sed -i "s|<ECR_IMAGE_PLACEHOLDER>|$IMAGE_URI|g" kubernetes/deployment.yaml
+
+        # 2. Apply the Service Account definition
+        echo "Applying Kubernetes Service Account..."
+        kubectl apply -f kubernetes/service-account.yaml
         
-        # 2. Apply the Service manifest (only creates it if it doesn't exist)
+        # 3. Apply the Service manifest (only creates it if it doesn't exist)
         echo "Applying Kubernetes Service..."
         kubectl apply -f kubernetes/service.yaml
         
-        # 3. Apply the updated Deployment manifest (triggers a rolling update)
+        # 4. Apply the updated Deployment manifest (triggers a rolling update)
         echo "Applying Kubernetes Deployment with image: $IMAGE_URI"
         kubectl apply -f kubernetes/deployment.yaml
