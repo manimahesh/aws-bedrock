@@ -16,6 +16,11 @@ const client = new BedrockRuntimeClient({ region: AWS_REGION });
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+
 async function generateItinerary(city, duration) {
     const messages = [
         { role: "system", content: "You are a helpful and creative travel planning assistant. Your output must be in Markdown format." },
