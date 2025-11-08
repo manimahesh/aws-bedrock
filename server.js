@@ -13,7 +13,7 @@ const port = 3000;
 // Initialize the Bedrock Runtime Client
 // The client will automatically discover credentials in the EKS environment
 // (via the IAM Role/IRSA) and use the specified region.
-const AWS_REGION = process.env.AWS_REGION || 'us-east-1'; // Use the region where Bedrock is enabled
+const AWS_REGION = process.env.AWS_REGION || 'us-west-2'; // Use the region where Bedrock is enabled
 const client = new BedrockRuntimeClient({ region: AWS_REGION });
 
 // Middleware
