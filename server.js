@@ -34,8 +34,8 @@ async function generateItinerary(city, duration) {
     };
 
     const input = {
-        // modelId: "openai.gpt-oss-120b-1:0", // Replace with your actual Bedrock OpenAI model ID
-        modelId: "anthropic.claude-haiku-4-5-20251001-v1:0",
+        modelId: "openai.gpt-oss-120b-1:0", // Replace with your actual Bedrock OpenAI model ID
+        // modelId: "anthropic.claude-haiku-4-5-20251001-v1:0",
         contentType: "application/json",
         accept: "application/json",
         body: JSON.stringify(payload),
